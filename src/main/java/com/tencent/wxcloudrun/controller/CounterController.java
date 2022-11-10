@@ -8,10 +8,7 @@ import com.tencent.wxcloudrun.dto.CounterRequest;
 import com.tencent.wxcloudrun.model.Counter;
 import com.tencent.wxcloudrun.service.CounterService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -55,9 +52,20 @@ public class CounterController {
   }
 
   @PostMapping("api/put")
-  ApiResponse getGZH(@RequestBody PublicRequest obj){
+  ApiResponse getGZH(@PathVariable String appid,
+                     @RequestBody String requestBody,
+                     @RequestParam("Content") String Content,
+                     @RequestParam("content") String content,
+                     @RequestParam("signature") String signature,
+                     @RequestParam("timestamp") String timestamp,
+                     @RequestParam("nonce") String nonce,
+                     @RequestParam("openid") String openid,
+                     @RequestParam(name = "encrypt_type", required = false) String encType,
+                     @RequestParam(name = "msg_signature", required = false) String msgSignature){
     logger.info("-----------------测试接收到消息 Start----------------");
-    logger.info("api/put post request, action:{}",obj);
+    logger.info("api/put post content, action:{}",content);
+    logger.info("api/put post Content, action:{}",Content);
+    logger.info("api/put post requestBody, action:{}",requestBody);
     logger.info("-----------------测试接收到消息 End----------------");
     return ApiResponse.ok();
   }
