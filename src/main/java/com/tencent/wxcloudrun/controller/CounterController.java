@@ -53,6 +53,11 @@ public class CounterController {
     return ApiResponse.ok("测试");
   }
 
+  @GetMapping("api/put")
+  ApiResponse getGZH(Object obj){
+    System.out.println("obj = " + obj);
+    return ApiResponse.ok();
+  }
   /**
    * 更新计数，自增或者清零
    * @param request {@link CounterRequest}
