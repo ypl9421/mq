@@ -56,8 +56,9 @@ public class CounterController {
 
   @PostMapping("api/put")
   ApiResponse getGZH(PublicRequest obj){
-    System.out.println("obj = " + obj);
+    logger.info("-----------------测试接收到消息 Start-----------------");
     logger.info("api/put post request, action:{}",obj);
+    logger.info("-----------------测试接收到消息 End-----------------");
     return ApiResponse.ok();
   }
   /**
