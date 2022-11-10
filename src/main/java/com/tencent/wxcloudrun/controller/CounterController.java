@@ -53,7 +53,7 @@ public class CounterController {
     return ApiResponse.ok("测试");
   }
 
-  @GetMapping("api/put")
+  @PostMapping("api/put")
   ApiResponse getGZH(Object obj){
     System.out.println("obj = " + obj);
     return ApiResponse.ok();
