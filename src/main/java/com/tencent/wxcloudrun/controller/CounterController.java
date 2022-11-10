@@ -1,5 +1,6 @@
 package com.tencent.wxcloudrun.controller;
 
+import com.tencent.wxcloudrun.dto.PublicRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tencent.wxcloudrun.config.ApiResponse;
@@ -54,7 +55,7 @@ public class CounterController {
   }
 
   @PostMapping("api/put")
-  ApiResponse getGZH(Object obj){
+  ApiResponse getGZH(PublicRequest obj){
     System.out.println("obj = " + obj);
     logger.info("api/put post request, action:{}",obj);
     return ApiResponse.ok();
