@@ -8,12 +8,12 @@ import lombok.Data;
  */
 @Data
 public class PublicRequest {
-    private String toUserName;
-    private String fromUserName;
-    private Integer createTime;
-    private String msgType;
-    private String content;
-    private String msgId;
+    private String ToUserName;
+    private String FromUserName;
+    private Integer CreateTime;
+    private String MsgType;
+    private String Content;
+    private String MsgId;
 
 
 
