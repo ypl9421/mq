@@ -48,6 +48,10 @@ public class CounterController {
     return ApiResponse.ok(count);
   }
 
+  @GetMapping("/api/test")
+  ApiResponse test(){
+    return ApiResponse.ok("测试");
+  }
 
   /**
    * 更新计数，自增或者清零
