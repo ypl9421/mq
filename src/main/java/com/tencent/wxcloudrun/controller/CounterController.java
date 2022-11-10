@@ -52,8 +52,7 @@ public class CounterController {
   }
 
   @PostMapping("api/put")
-  ApiResponse getGZH(@PathVariable String appid,
-                     @RequestBody String requestBody,
+  ApiResponse getGZH(@RequestBody String requestBody,
                      @RequestParam("Content") String Content,
                      @RequestParam("content") String content,
                      @RequestParam("signature") String signature,
