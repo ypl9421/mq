@@ -16,7 +16,8 @@ public class InInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("----------进入过滤器------------>");
-        System.out.println("request = " + request);
+        log.info("handler = "+handler);
+        log.info("request = " + request);
         request.getParameterMap().forEach((k,v)->{
             System.out.println(k+"*********"+v);
         });
