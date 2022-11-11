@@ -1,6 +1,7 @@
 package com.tencent.wxcloudrun.config;
 
 import com.tencent.wxcloudrun.interceptor.InInterceptor;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -8,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author 无语
  * @create 2022-11-11 10:48
  */
+@Configuration
 public class MyMVCConfig implements WebMvcConfigurer {
 
     @Override
