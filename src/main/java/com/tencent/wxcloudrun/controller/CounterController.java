@@ -52,19 +52,12 @@ public class CounterController {
   }
 
   @PostMapping("api/put")
-  ApiResponse getGZH(@RequestBody String requestBody,
-                     @RequestParam("Content") String Content,
-                     @RequestParam("content") String content,
-                     @RequestParam("signature") String signature,
-                     @RequestParam("timestamp") String timestamp,
-                     @RequestParam("nonce") String nonce,
-                     @RequestParam("openid") String openid,
-                     @RequestParam(name = "encrypt_type", required = false) String encType,
-                     @RequestParam(name = "msg_signature", required = false) String msgSignature){
+  ApiResponse getGZH(String ToUserName,String FromUserName,Integer CreateTime
+  ,String MsgType,String Content,String MsgId){
     logger.info("-----------------测试接收到消息 Start----------------");
-    logger.info("api/put post content, action:{}",content);
+    logger.info("api/put post ToUserName, action:{}",ToUserName);
+    logger.info("api/put post FromUserName, action:{}",FromUserName);
     logger.info("api/put post Content, action:{}",Content);
-    logger.info("api/put post requestBody, action:{}",requestBody);
     logger.info("-----------------测试接收到消息 End----------------");
     return ApiResponse.ok();
   }
