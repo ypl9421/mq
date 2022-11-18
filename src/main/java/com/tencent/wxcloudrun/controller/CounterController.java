@@ -1,6 +1,11 @@
 package com.tencent.wxcloudrun.controller;
 
+import cn.hutool.crypto.SecureUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.tencent.wxcloudrun.dto.PublicRequest;
+import com.tencent.wxcloudrun.dto.ReturnResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tencent.wxcloudrun.config.ApiResponse;
@@ -8,9 +13,11 @@ import com.tencent.wxcloudrun.dto.CounterRequest;
 import com.tencent.wxcloudrun.model.Counter;
 import com.tencent.wxcloudrun.service.CounterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.List;
 
@@ -18,78 +25,58 @@ import java.util.List;
  * counter控制器
  */
 @RestController
-
 public class CounterController {
 
-  final CounterService counterService;
+//  final CounterService counterService;
   final Logger logger;
+  final String TOKEN = "wxnf";
 
-  public CounterController(@Autowired CounterService counterService) {
-    this.counterService = counterService;
+  public CounterController() {
+//    this.counterService = counterService;
     this.logger = LoggerFactory.getLogger(CounterController.class);
   }
 
 
-  /**
-   * 获取当前计数
-   * @return API response json
-   */
-  @GetMapping(value = "/api/count")
-  ApiResponse get() {
-    logger.info("/api/count get request");
-    Optional<Counter> counter = counterService.getCounter(1);
-    Integer count = 0;
-    if (counter.isPresent()) {
-      count = counter.get().getCount();
-    }
 
-    return ApiResponse.ok(count);
-  }
 
   @GetMapping("/api/test")
   ApiResponse test(){
     return ApiResponse.ok("测试");
   }
-
-  @PostMapping("api/put")
-  ApiResponse getGZH(String ToUserName,String FromUserName,Integer CreateTime
-  ,String MsgType,String Content,String MsgId){
-    logger.info("-----------------测试接收到消息 Start----------------");
-    logger.info("api/put post ToUserName, action:{}",ToUserName);
-    logger.info("api/put post FromUserName, action:{}",FromUserName);
-    logger.info("api/put post Content, action:{}",Content);
-    logger.info("-----------------测试接收到消息 End----------------");
-    return ApiResponse.ok();
-  }
-  /**
-   * 更新计数，自增或者清零
-   * @param request {@link CounterRequest}
-   * @return API response json
-   */
-  @PostMapping(value = "/api/count")
-  ApiResponse create(@RequestBody CounterRequest request) {
-    logger.info("/api/count post request, action: {}", request.getAction());
-
-    Optional<Counter> curCounter = counterService.getCounter(1);
-    if (request.getAction().equals("inc")) {
-      Integer count = 1;
-      if (curCounter.isPresent()) {
-        count += curCounter.get().getCount();
-      }
-      Counter counter = new Counter();
-      counter.setId(1);
-      counter.setCount(count);
-      counterService.upsertCount(counter);
-      return ApiResponse.ok(count);
-    } else if (request.getAction().equals("clear")) {
-      if (!curCounter.isPresent()) {
-        return ApiResponse.ok(0);
-      }
-      counterService.clearCount(1);
-      return ApiResponse.ok(0);
-    } else {
-      return ApiResponse.error("参数action错误");
+  @GetMapping("/api/put")
+  public String validate(String signature,String timestamp,String nonce,String echostr){
+    // 1. 将token、timestamp、nonce三个参数进行字典序排序
+    String[] arr = {timestamp, nonce, TOKEN};
+    Arrays.sort(arr);
+    // 2. 将三个参数字符串拼接成一个字符串进行sha1加密
+    StringBuilder sb = new StringBuilder();
+    for (String temp : arr) {
+      sb.append(temp);
     }
+    // 这里利用了hutool的加密工具类
+    String sha1 = SecureUtil.sha1(sb.toString());
+    // 3. 加密后的字符串与signature对比，如果相同则该请求来源于微信，原样返回echostr
+    if (sha1.equals(signature)){
+      return echostr;
+    }
+    // 接入失败
+    return null;
   }
-  
+  @PostMapping(value = "api/put",produces = MediaType.APPLICATION_XML_VALUE)
+  @ResponseBody
+  String getGZH(@RequestBody PublicRequest request){
+    logger.info("-----------------测试接收到消息 Start----------------");
+    logger.info("api/put post PublicRequest, action:{}",request);
+    logger.info("-----------------测试接收到消息 End----------------");
+    String xml ="<xml>\n" +
+            "  <ToUserName><![CDATA["+request.getFromUserName()+"]]></ToUserName>\n" +
+            "  <FromUserName><![CDATA["+request.getToUserName()+"]]></FromUserName>\n" +
+            "  <CreateTime>"+request.getCreateTime()
+            +"</CreateTime>\n" +
+            "  <MsgType><![CDATA[text]]></MsgType>\n" +
+            "  <Content><![CDATA["+request.getContent()+"：服务器回复给你的！]]></Content>\n" +
+            "</xml>";
+    return xml;
+  }
+
 }
