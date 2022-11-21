@@ -6,6 +6,7 @@ import cn.hutool.json.JSONUtil;
 import com.lark.oapi.okhttp.*;
 import com.tencent.wxcloudrun.controller.CounterController;
 import com.tencent.wxcloudrun.entity.Root;
+import com.tencent.wxcloudrun.pojo.JsonRootBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -14,6 +15,8 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author 无语
@@ -96,11 +99,64 @@ public class FeiShuAPI {
         return root;
     }
 
+    public static JsonRootBean getAllFeiShuStudent(String name){
+        JsonRootBean rootBean = null;
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("");
+        Request request = new Request.Builder()
+                .url("https://open.feishu.cn/open-apis/bitable/v1/apps/bascnfv0cxTIwfIZThCRbp888Ad/tables/tblxZYmnzso3KOiA/records?filter=CurrentValue.%5B%E5%AD%A6%E7%94%9F%E5%A7%93%E5%90%8D%5D+%3D+%22"+name+"%22&page_size=20&view_id=vewhhpHuLL")
+                .method("GET", null)
+                .addHeader("Authorization", "Bearer "+getTenantAccessToken())
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            String json = response.body().string();
+            rootBean = JSONUtil.toBean(json, JsonRootBean.class);
+//            System.out.println(root);
+            logger.info("查询学生对象 {}",json);
+            logger.info("查询学生对象 {}",rootBean);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return rootBean;
+    }
 
+    public static String getImageURL(String file_token){
+        String imgurl = "https://mmbiz.qpic.cn/mmbiz_png/1QiaAPkrH3u5CuybtMXIpqQLYiaqktK8jUHd7rxAp3j1gQiaO6aDMLhspHmgwd9tfzvicP8OD6owZ6DHuxk2EK5sGQ/0?wx_fmt=png";
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("");
+        Request request = new Request.Builder()
+                .url("https://open.feishu.cn/open-apis/drive/v1/medias/batch_get_tmp_download_url?file_tokens="+file_token)
+                .method("GET", null)
+                .addHeader("Authorization", "Bearer "+getTenantAccessToken())
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            String json  = response.body().string();
+            JSONObject jsonObject = JSONUtil.parseObj(json);
+//            Object tem_url = JSONUtil.parseArray(JSONUtil.parseObj(jsonObject.get("data")).get("tmp_download_urls")).get(0);
+//            if (tem_url!=null){
+//                imgurl =tem_url+"";
+//            }
+            HashMap<String, Map> hashMap = JSONUtil.parse(jsonObject).toBean(new HashMap<String, Map>().getClass());
+            Object tmp_url = JSONUtil.parseObj(JSONUtil.parseArray(hashMap.get("data").get("tmp_download_urls")).get(0)).get("tmp_download_url");
+            logger.info("hashMap = {}" , tmp_url);
+            imgurl = tmp_url+"";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return imgurl;
+    }
 
     public static void main(String[] args) {
 //        getStudent("李园杰");
 //        getStudent("赵磊");
 //        getStudent("罗鸣");
+
+        JsonRootBean 王亮 = getAllFeiShuStudent("王亮");
+        System.out.println(王亮);
+        System.out.println(getImageURL(王亮.getData().getItems().get(0).getFields().get照片().get(0).getFile_token()));
     }
 }
